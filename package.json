@@ -9,7 +9,7 @@
     "prettier-format": "prettier 'src/**/*.ts' --write",
     "migrate:deploy": "prisma migrate deploy",
     "build": "prisma generate && npm run generate && tsc",
-    "start": "node ./dist/src/index.js"
+    "start": "node dist/src/index.js"
   },
   "author": "",
   "license": "ISC",
