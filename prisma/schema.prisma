@@ -3,8 +3,8 @@
 
 // 1
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"  
+  url      = env("DATABASE_URL")  
 }
 
 // 2
@@ -31,3 +31,4 @@ model User {
   links    Link[] @relation(name: "PostedBy")  // 2
   votes    Link[] @relation(name: "Votes")  // 1
 }
+
