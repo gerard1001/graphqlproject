@@ -8,10 +8,6 @@ export interface Context {
   userId?: number;
 }
 
-// export const context: Context = {
-//   prisma,
-// };
-
 export const context = ({ req }: { req: Request }): Context => {
   const token =
     req && req.headers.authorization
