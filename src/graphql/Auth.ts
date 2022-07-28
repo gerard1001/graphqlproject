@@ -1,46 +1,57 @@
-import { objectType, extendType, nonNull, stringArg } from "nexus";
-import * as bcrypt from "bcryptjs";
-import * as jwt from "jsonwebtoken";
-import { APP_SECRET } from "../utils/auth";
+import { Prisma, PrismaClient } from "@prisma/client";
+import { extendType, nonNull, objectType, stringArg } from "nexus";
+import { hashPassword, signToken, verifyPassword } from "../utils/auth.util";
+import { userValidation } from "../validations/user.validations";
 
-export const AuthPayload = objectType({
-  name: "AuthPayload",
+export const AuthResponse = objectType({
+  name: "AuthResponse",
   definition(t) {
     t.nonNull.string("token");
-    t.nonNull.field("user", {
-      type: "User",
-    });
+    t.nonNull.field("user", { type: "User" });
   },
 });
 
 export const AuthMutation = extendType({
   type: "Mutation",
   definition(t) {
-    t.nonNull.field("login", {
-      type: "AuthPayload",
+    t.nonNull.field("signup", {
+      type: "AuthResponse",
       args: {
+        name: nonNull(stringArg()),
         email: nonNull(stringArg()),
         password: nonNull(stringArg()),
       },
+      // @ts-ignore
       async resolve(parent, args, context) {
-        // 1
-        const user = await context.prisma.user.findUnique({
-          where: { email: args.email },
+        const { prisma }: { prisma: PrismaClient } = context;
+        const {
+          name,
+          email,
+          password,
+        }: { name: string; email: string; password: string } = args;
+
+        try {
+          userValidation({ name, email, password });
+        } catch ({ message }) {
+          console.log("ERROR", message);
+          throw new Error(JSON.stringify(message));
+        }
+
+        if ((await prisma.user.findMany({ where: { email } })).length !== 0) {
+          throw new Error(`This email ${email} already exists.`);
+        }
+
+        const hashedPassword = hashPassword(password);
+
+        const user = await prisma.user.create({
+          data: {
+            name,
+            email,
+            password: hashedPassword,
+          },
         });
-        if (!user) {
-          throw new Error("No such user found");
-        }
+        const token = signToken({ userId: user.id });
 
-        // 2
-        const valid = await bcrypt.compare(args.password, user.password);
-        if (!valid) {
-          throw new Error("Invalid password");
-        }
-
-        // 3
-        const token = jwt.sign({ userId: user.id }, APP_SECRET);
-
-        // 4
         return {
           token,
           user,
@@ -48,31 +59,35 @@ export const AuthMutation = extendType({
       },
     });
 
-    t.nonNull.field("signup", {
-      // 1
-      type: "AuthPayload",
+    t.nonNull.field("login", {
+      type: "AuthResponse",
       args: {
         email: nonNull(stringArg()),
         password: nonNull(stringArg()),
-        name: nonNull(stringArg()),
       },
-      async resolve(parent, args, context) {
-        const { email, name } = args;
-        // 2
-        const password = await bcrypt.hash(args.password, 10);
+      // @ts-ignore
+      async resolve(_, args, context) {
+        const { prisma } = context;
+        const { email, password } = args;
 
-        // 3
-        const user = await context.prisma.user.create({
-          data: { email, name, password },
+        const user = await prisma.user.findFirst({
+          where: { email },
+          include: { flashcardsRead: true, flashcardsCreated: true },
         });
 
-        // 4
-        const token = jwt.sign({ userId: user.id }, APP_SECRET);
+        if (!user) {
+          throw new Error(`This email: ${email}; is not registered`);
+        }
 
-        // 5
+        if (!verifyPassword(password, user.password)) {
+          throw new Error(`Invalid credentials`);
+        }
+
+        const token = signToken({ userId: user.id });
+
         return {
-          token,
           user,
+          token,
         };
       },
     });

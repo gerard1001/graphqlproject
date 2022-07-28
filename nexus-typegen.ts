@@ -11,7 +11,7 @@ declare global {
     /**
      * A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
      */
-    dateTime<FieldName extends string>(fieldName: FieldName, opts?: core.CommonInputFieldConfig<TypeName, FieldName>): void // "DateTime";
+    DateTime<FieldName extends string>(fieldName: FieldName, opts?: core.CommonInputFieldConfig<TypeName, FieldName>): void // "DateTime";
   }
 }
 declare global {
@@ -19,7 +19,7 @@ declare global {
     /**
      * A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
      */
-    dateTime<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // "DateTime";
+    DateTime<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // "DateTime";
   }
 }
 
@@ -29,10 +29,11 @@ declare global {
 }
 
 export interface NexusGenInputs {
-  LinkOrderByInput: { // input type
+  cardOrderByInput: { // input type
+    answer?: NexusGenEnums['Sort'] | null; // Sort
     createdAt?: NexusGenEnums['Sort'] | null; // Sort
-    description?: NexusGenEnums['Sort'] | null; // Sort
-    url?: NexusGenEnums['Sort'] | null; // Sort
+    id?: NexusGenEnums['Sort'] | null; // Sort
+    question?: NexusGenEnums['Sort'] | null; // Sort
   }
 }
 
@@ -50,31 +51,32 @@ export interface NexusGenScalars {
 }
 
 export interface NexusGenObjects {
-  AuthPayload: { // root type
+  AuthResponse: { // root type
     token: string; // String!
     user: NexusGenRootTypes['User']; // User!
   }
-  Feed: { // root type
+  FindCard: { // root type
+    cards: NexusGenRootTypes['FlashCard'][]; // [FlashCard!]!
     count: number; // Int!
-    id?: string | null; // ID
-    links: NexusGenRootTypes['Link'][]; // [Link!]!
   }
-  Link: { // root type
+  FlashCard: { // root type
+    answer: string; // String!
     createdAt: NexusGenScalars['DateTime']; // DateTime!
-    description: string; // String!
     id: number; // Int!
-    url: string; // String!
+    question: string; // String!
   }
   Mutation: {};
   Query: {};
   User: { // root type
+    createdAt: NexusGenScalars['DateTime']; // DateTime!
     email: string; // String!
     id: number; // Int!
     name: string; // String!
   }
-  Vote: { // root type
-    link: NexusGenRootTypes['Link']; // Link!
-    user: NexusGenRootTypes['User']; // User!
+  UserReadFlashcard: { // root type
+    confidence: number; // Int!
+    id: number; // Int!
+    readAt: NexusGenScalars['DateTime']; // DateTime!
   }
 }
 
@@ -89,108 +91,129 @@ export type NexusGenRootTypes = NexusGenObjects
 export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars & NexusGenEnums
 
 export interface NexusGenFieldTypes {
-  AuthPayload: { // field return type
+  AuthResponse: { // field return type
     token: string; // String!
     user: NexusGenRootTypes['User']; // User!
   }
-  Feed: { // field return type
+  FindCard: { // field return type
+    cards: NexusGenRootTypes['FlashCard'][]; // [FlashCard!]!
     count: number; // Int!
-    id: string | null; // ID
-    links: NexusGenRootTypes['Link'][]; // [Link!]!
   }
-  Link: { // field return type
+  FlashCard: { // field return type
+    answer: string; // String!
+    author: NexusGenRootTypes['User'] | null; // User
     createdAt: NexusGenScalars['DateTime']; // DateTime!
-    description: string; // String!
     id: number; // Int!
-    postedBy: NexusGenRootTypes['User'] | null; // User
-    url: string; // String!
-    voters: NexusGenRootTypes['User'][]; // [User!]!
+    question: string; // String!
+    usersRead: Array<NexusGenRootTypes['UserReadFlashcard'] | null> | null; // [UserReadFlashcard]
   }
   Mutation: { // field return type
-    login: NexusGenRootTypes['AuthPayload']; // AuthPayload!
-    post: NexusGenRootTypes['Link']; // Link!
-    signup: NexusGenRootTypes['AuthPayload']; // AuthPayload!
-    vote: NexusGenRootTypes['Vote'] | null; // Vote
+    createCard: NexusGenRootTypes['FlashCard']; // FlashCard!
+    deleteCard: NexusGenRootTypes['FlashCard']; // FlashCard!
+    login: NexusGenRootTypes['AuthResponse']; // AuthResponse!
+    readCard: NexusGenRootTypes['FlashCard']; // FlashCard!
+    signup: NexusGenRootTypes['AuthResponse']; // AuthResponse!
+    updateCard: NexusGenRootTypes['FlashCard']; // FlashCard!
   }
   Query: { // field return type
-    feed: NexusGenRootTypes['Feed']; // Feed!
+    findCard: NexusGenRootTypes['FindCard'] | null; // FindCard
   }
   User: { // field return type
+    createdAt: NexusGenScalars['DateTime']; // DateTime!
     email: string; // String!
+    flashcardsCreated: NexusGenRootTypes['FlashCard'][]; // [FlashCard!]!
+    flashcardsRead: NexusGenRootTypes['UserReadFlashcard'][]; // [UserReadFlashcard!]!
     id: number; // Int!
-    links: NexusGenRootTypes['Link'][]; // [Link!]!
     name: string; // String!
-    votes: NexusGenRootTypes['Link'][]; // [Link!]!
   }
-  Vote: { // field return type
-    link: NexusGenRootTypes['Link']; // Link!
-    user: NexusGenRootTypes['User']; // User!
+  UserReadFlashcard: { // field return type
+    confidence: number; // Int!
+    flashCard: NexusGenRootTypes['FlashCard'] | null; // FlashCard
+    id: number; // Int!
+    readAt: NexusGenScalars['DateTime']; // DateTime!
+    user: NexusGenRootTypes['User'] | null; // User
   }
 }
 
 export interface NexusGenFieldTypeNames {
-  AuthPayload: { // field return type name
+  AuthResponse: { // field return type name
     token: 'String'
     user: 'User'
   }
-  Feed: { // field return type name
+  FindCard: { // field return type name
+    cards: 'FlashCard'
     count: 'Int'
-    id: 'ID'
-    links: 'Link'
   }
-  Link: { // field return type name
+  FlashCard: { // field return type name
+    answer: 'String'
+    author: 'User'
     createdAt: 'DateTime'
-    description: 'String'
     id: 'Int'
-    postedBy: 'User'
-    url: 'String'
-    voters: 'User'
+    question: 'String'
+    usersRead: 'UserReadFlashcard'
   }
   Mutation: { // field return type name
-    login: 'AuthPayload'
-    post: 'Link'
-    signup: 'AuthPayload'
-    vote: 'Vote'
+    createCard: 'FlashCard'
+    deleteCard: 'FlashCard'
+    login: 'AuthResponse'
+    readCard: 'FlashCard'
+    signup: 'AuthResponse'
+    updateCard: 'FlashCard'
   }
   Query: { // field return type name
-    feed: 'Feed'
+    findCard: 'FindCard'
   }
   User: { // field return type name
+    createdAt: 'DateTime'
     email: 'String'
+    flashcardsCreated: 'FlashCard'
+    flashcardsRead: 'UserReadFlashcard'
     id: 'Int'
-    links: 'Link'
     name: 'String'
-    votes: 'Link'
   }
-  Vote: { // field return type name
-    link: 'Link'
+  UserReadFlashcard: { // field return type name
+    confidence: 'Int'
+    flashCard: 'FlashCard'
+    id: 'Int'
+    readAt: 'DateTime'
     user: 'User'
   }
 }
 
 export interface NexusGenArgTypes {
   Mutation: {
+    createCard: { // args
+      answer: string; // String!
+      question: string; // String!
+    }
+    deleteCard: { // args
+      id: number; // Int!
+    }
     login: { // args
       email: string; // String!
       password: string; // String!
     }
-    post: { // args
-      description: string; // String!
-      url: string; // String!
+    readCard: { // args
+      confidence: number; // Int!
+      id: number; // Int!
     }
     signup: { // args
       email: string; // String!
       name: string; // String!
       password: string; // String!
     }
-    vote: { // args
-      linkId: number; // Int!
+    updateCard: { // args
+      answer?: string | null; // String
+      id: number; // Int!
+      question?: string | null; // String
     }
   }
   Query: {
-    feed: { // args
+    findCard: { // args
+      email?: string | null; // String
       filter?: string | null; // String
-      orderBy?: NexusGenInputs['LinkOrderByInput'][] | null; // [LinkOrderByInput!]
+      id?: number | null; // Int
+      orderBy?: NexusGenInputs['cardOrderByInput'][] | null; // [cardOrderByInput!]
       skip?: number | null; // Int
       take?: number | null; // Int
     }

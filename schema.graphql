@@ -2,7 +2,7 @@
 ### Do not make changes to this file directly
 
 
-type AuthPayload {
+type AuthResponse {
   token: String!
   user: User!
 }
@@ -12,36 +12,31 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 """
 scalar DateTime
 
-type Feed {
+type FindCard {
+  cards: [FlashCard!]!
   count: Int!
-  id: ID
-  links: [Link!]!
 }
 
-type Link {
+type FlashCard {
+  answer: String!
+  author: User
   createdAt: DateTime!
-  description: String!
   id: Int!
-  postedBy: User
-  url: String!
-  voters: [User!]!
-}
-
-input LinkOrderByInput {
-  createdAt: Sort
-  description: Sort
-  url: Sort
+  question: String!
+  usersRead: [UserReadFlashcard]
 }
 
 type Mutation {
-  login(email: String!, password: String!): AuthPayload!
-  post(description: String!, url: String!): Link!
-  signup(email: String!, name: String!, password: String!): AuthPayload!
-  vote(linkId: Int!): Vote
+  createCard(answer: String!, question: String!): FlashCard!
+  deleteCard(id: Int!): FlashCard!
+  login(email: String!, password: String!): AuthResponse!
+  readCard(confidence: Int!, id: Int!): FlashCard!
+  signup(email: String!, name: String!, password: String!): AuthResponse!
+  updateCard(answer: String, id: Int!, question: String): FlashCard!
 }
 
 type Query {
-  feed(filter: String, orderBy: [LinkOrderByInput!], skip: Int, take: Int): Feed!
+  findCard(email: String, filter: String, id: Int, orderBy: [cardOrderByInput!], skip: Int, take: Int): FindCard
 }
 
 enum Sort {
@@ -50,14 +45,25 @@ enum Sort {
 }
 
 type User {
+  createdAt: DateTime!
   email: String!
+  flashcardsCreated: [FlashCard!]!
+  flashcardsRead: [UserReadFlashcard!]!
   id: Int!
-  links: [Link!]!
   name: String!
-  votes: [Link!]!
 }
 
-type Vote {
-  link: Link!
-  user: User!
+type UserReadFlashcard {
+  confidence: Int!
+  flashCard: FlashCard
+  id: Int!
+  readAt: DateTime!
+  user: User
+}
+
+input cardOrderByInput {
+  answer: Sort
+  createdAt: Sort
+  id: Sort
+  question: Sort
 }

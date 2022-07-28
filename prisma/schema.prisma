@@ -1,34 +1,43 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// 1
-datasource db {
-  provider = "postgresql"  
-  url      = env("DATABASE_URL")  
-}
-
-// 2
 generator client {
   provider = "prisma-client-js"
 }
 
-// 3
-model Link {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  description String
-  url         String
-  postedBy    User?    @relation(name: "PostedBy", fields: [postedById], references: [id])  // 2
-  postedById  Int?
-  voters      User[]   @relation(name: "Votes")
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model FlashCard {
+  id        Int                 @id @default(autoincrement())
+  createdAt DateTime            @default(now())
+  question  String
+  answer    String
+  usersRead UserReadFlashcard[]
+  author    User                @relation(name: "flashcardAuthor", fields: [authorId], references: [id])
+  authorId  Int
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
-  links    Link[] @relation(name: "PostedBy")  // 2
-  votes    Link[] @relation(name: "Votes")  // 1
+  id                Int                 @id @default(autoincrement())
+  createdAt         DateTime            @default(now())
+  name              String
+  email             String              @unique
+  password          String
+  flashcardsRead    UserReadFlashcard[]
+  flashcardsCreated FlashCard[]         @relation(name: "flashcardAuthor")
 }
 
+model UserReadFlashcard {
+  id          Int       @id @default(autoincrement())
+  readAt      DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id])
+  userId      Int
+  flashcard   FlashCard @relation(fields: [flashcardId], references: [id])
+  flashcardId Int
+  confidence  Int
+
+  @@unique([userId, flashcardId])
+}
