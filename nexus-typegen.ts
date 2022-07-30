@@ -68,7 +68,7 @@ export interface NexusGenObjects {
   Mutation: {};
   Query: {};
   User: { // root type
-    createdAt: NexusGenScalars['DateTime']; // DateTime!
+    createAt: NexusGenScalars['DateTime']; // DateTime!
     email: string; // String!
     id: number; // Int!
     name: string; // String!
@@ -119,7 +119,7 @@ export interface NexusGenFieldTypes {
     findCard: NexusGenRootTypes['FindCard'] | null; // FindCard
   }
   User: { // field return type
-    createdAt: NexusGenScalars['DateTime']; // DateTime!
+    createAt: NexusGenScalars['DateTime']; // DateTime!
     email: string; // String!
     flashcardsCreated: NexusGenRootTypes['FlashCard'][]; // [FlashCard!]!
     flashcardsRead: NexusGenRootTypes['UserReadFlashcard'][]; // [UserReadFlashcard!]!
@@ -164,7 +164,7 @@ export interface NexusGenFieldTypeNames {
     findCard: 'FindCard'
   }
   User: { // field return type name
-    createdAt: 'DateTime'
+    createAt: 'DateTime'
     email: 'String'
     flashcardsCreated: 'FlashCard'
     flashcardsRead: 'UserReadFlashcard'

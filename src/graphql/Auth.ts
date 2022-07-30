@@ -33,12 +33,11 @@ export const AuthMutation = extendType({
         try {
           userValidation({ name, email, password });
         } catch ({ message }) {
-          console.log("ERROR", message);
           throw new Error(JSON.stringify(message));
         }
 
         if ((await prisma.user.findMany({ where: { email } })).length !== 0) {
-          throw new Error(`This email ${email} already exists.`);
+          throw new Error(`A user with email ${email} already exists !!!`);
         }
 
         const hashedPassword = hashPassword(password);
@@ -58,7 +57,6 @@ export const AuthMutation = extendType({
         };
       },
     });
-
     t.nonNull.field("login", {
       type: "AuthResponse",
       args: {
@@ -76,7 +74,7 @@ export const AuthMutation = extendType({
         });
 
         if (!user) {
-          throw new Error(`This email: ${email}; is not registered`);
+          throw new Error(`No user with email ${email} exist !!!!!!`);
         }
 
         if (!verifyPassword(password, user.password)) {

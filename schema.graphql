@@ -45,7 +45,7 @@ enum Sort {
 }
 
 type User {
-  createdAt: DateTime!
+  createAt: DateTime!
   email: String!
   flashcardsCreated: [FlashCard!]!
   flashcardsRead: [UserReadFlashcard!]!
