@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
+  "engines": {
+    "node": "16.14.0"
+  },
   "scripts": {
     "dev": "ts-node-dev --transpile-only --no-notify --exit-child src/index.ts",
     "generate": "ts-node --transpile-only src/schema",
